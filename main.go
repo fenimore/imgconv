@@ -20,7 +20,7 @@ func main() {
 	// Set quality for JPEG compression
 	quality := 100
 	if len(args) == 2 {
-		quality, err = strconv.Atoi(args[2])
+		quality, err = strconv.Atoi(args[1])
 		if err != nil {
 			panic(err)
 		}
@@ -50,6 +50,12 @@ func main() {
 		}
 	}
 
+	return
+	// TODO: Add compression jpeg -> jpeg
+	err = CompressJpeg(input, name, quality)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func ConvertPngToJpeg(input *os.File, name string, quality int) error {
@@ -92,5 +98,24 @@ func ConvertJpegToPgn(input *os.File, name string) error {
 	return nil
 }
 
-func CompressJpeg() {
+func CompressJpeg(input *os.File, name string, quality int) error {
+	image, err := jpeg.Decode(input)
+	if err != nil {
+		return err
+	}
+
+	output, err := os.Create(name + ".jpeg")
+	if err != nil {
+		return err
+	}
+
+	options := new(jpeg.Options)
+	options.Quality = quality
+
+	err = jpeg.Encode(output, image, options)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
